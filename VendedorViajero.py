@@ -19,8 +19,25 @@ def CrearPrimeraSolucion(n):
     np.random.shuffle(Solucion)
     return Solucion
 
-def CrearCosto(primeraSolucion, matrizDistancia):
-    for i in 
+def CrearCosto(Solucion, matrizDistancia):
+    suma =0
+    for i in range(0,Solucion.shape[0]-1,1):
+        for j in range(1,Solucion.shape[0],1):
+            suma += matrizDistancia[Solucion[i],Solucion[j]]
+    suma += matrizDistancia[Solucion[Solucion.shape[0]-1],0]
+    return suma
+
+def CrearMatrizFeromonaInicial(Costo,n):
+    Matriz = np.ones((n,n),float)
+    Matriz = (1/(n*Costo))*Matriz
+    np.fill_diagonal(Matriz,0)
+    return Matriz
+
+def CrearColonia(col,n):
+    Matriz = np.zeros((col,n),int)
+    for i in range(col):
+        Matriz[i][0] = np.random.randint(n)
+    return Matriz
         
     
 if len(sys.argv)==8:
@@ -42,6 +59,10 @@ matrizCoordenadas = LimpiezaDatos(entrada)
 matrizDistancia = distance_matrix(matrizCoordenadas,matrizCoordenadas)
 matrizHeuristica = CrearMatrizHeuristica(matrizDistancia)
 primeraSolucion = CrearPrimeraSolucion(matrizHeuristica.shape[0])
+Costo = CrearCosto(primeraSolucion,matrizDistancia)
+MatrizFeromonaInicial = CrearMatrizFeromonaInicial(Costo,matrizHeuristica.shape[0])
+Colonia = CrearColonia(col,matrizHeuristica.shape[0])
+print(Colonia)
 
 
 
