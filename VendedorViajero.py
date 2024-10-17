@@ -15,16 +15,15 @@ def CrearMatrizHeuristica(matrizDistancia):
     return matrizHeuristica
 
 def CrearPrimeraSolucion(n):
-    Solucion = np.arange(n)
+    Solucion = np.arange(1,n+1)
     np.random.shuffle(Solucion)
     return Solucion
 
 def CrearCosto(Solucion, matrizDistancia):
     suma =0
-    for i in range(0,Solucion.shape[0]-1,1):
-        for j in range(1,Solucion.shape[0],1):
-            suma += matrizDistancia[Solucion[i],Solucion[j]]
-    suma += matrizDistancia[Solucion[Solucion.shape[0]-1],0]
+    for i in range(0,Solucion.shape[0]-2,1):
+        suma+=matrizDistancia[Solucion[i]-1,Solucion[i+1]-1]
+    suma += matrizDistancia[Solucion[Solucion.shape[0]-1]-1,0]
     return suma
 
 def CrearMatrizFeromonaInicial(Costo,n):
@@ -36,9 +35,16 @@ def CrearMatrizFeromonaInicial(Costo,n):
 def CrearColonia(col,n):
     Matriz = np.zeros((col,n),int)
     for i in range(col):
-        Matriz[i][0] = np.random.randint(n)
+        Matriz[i][0] = np.random.randint(1,n+1)
     return Matriz
-        
+
+def Transicion_1(Feromona, Heuristica,B,hormigas):
+    for i in range(hormigas.shape[0]):
+        for j in range(hormigas.shape[1]-1):
+            vector_aux = np.power(Heuristica[hormigas[i][j]-1],B)*Feromona[hormigas[i][j]-1]
+            pos_max = np.where(vector_aux == np.max(vector_aux))[0][0]   #si me tira error en esta linea borrar un [0]
+            hormigas[i][j+1] = pos_max + 1   
+            #faltaria crear una mascara para ver porque nodos ya pase y quitarlos de la ecuacion para no volver a pasar por el mismo nodo.    
     
 if len(sys.argv)==8:
     semilla = int(sys.argv[1])
@@ -62,7 +68,5 @@ primeraSolucion = CrearPrimeraSolucion(matrizHeuristica.shape[0])
 Costo = CrearCosto(primeraSolucion,matrizDistancia)
 MatrizFeromonaInicial = CrearMatrizFeromonaInicial(Costo,matrizHeuristica.shape[0])
 Colonia = CrearColonia(col,matrizHeuristica.shape[0])
-print(Colonia)
-
 
 
