@@ -39,12 +39,21 @@ def CrearColonia(col,n):
     return Matriz
 
 def Transicion_1(Feromona, Heuristica,B,hormigas):
+    mascara = np.ones((hormigas.shape[0],hormigas.shape[1]),int)
+    for i in range(hormigas.shape[0]):
+        for j in range(hormigas.shape[1]):
+            if hormigas[i][j] != 0:
+                mascara[i][hormigas[i][j]-1] = 0  
     for i in range(hormigas.shape[0]):
         for j in range(hormigas.shape[1]-1):
-            vector_aux = np.power(Heuristica[hormigas[i][j]-1],B)*Feromona[hormigas[i][j]-1]
-            pos_max = np.where(vector_aux == np.max(vector_aux))[0][0]   #si me tira error en esta linea borrar un [0]
-            hormigas[i][j+1] = pos_max + 1   
-            #faltaria crear una mascara para ver porque nodos ya pase y quitarlos de la ecuacion para no volver a pasar por el mismo nodo.    
+            vector_aux = np.power(Heuristica[hormigas[i][j]-1],B)*Feromona[hormigas[i][j]-1]*mascara[i]
+            pos_max = np.random.choice(np.where(vector_aux == np.max(vector_aux))[0])   #si me tira error en esta linea borrar un [0]
+            hormigas[i][j+1] = pos_max + 1
+            mascara[i][pos_max]=0 
+    return hormigas
+
+
+#implementar la ruleta
     
 if len(sys.argv)==8:
     semilla = int(sys.argv[1])
@@ -66,7 +75,10 @@ matrizDistancia = distance_matrix(matrizCoordenadas,matrizCoordenadas)
 matrizHeuristica = CrearMatrizHeuristica(matrizDistancia)
 primeraSolucion = CrearPrimeraSolucion(matrizHeuristica.shape[0])
 Costo = CrearCosto(primeraSolucion,matrizDistancia)
+print(Costo)
 MatrizFeromonaInicial = CrearMatrizFeromonaInicial(Costo,matrizHeuristica.shape[0])
 Colonia = CrearColonia(col,matrizHeuristica.shape[0])
+hormigas = Transicion_1(MatrizFeromonaInicial,matrizHeuristica,B,Colonia)
+
 
 
